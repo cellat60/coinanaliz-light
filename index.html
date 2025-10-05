@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
+  <meta charset="UTF-8">
+  <title>Binance Coin Performans Tablosu - Matrix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Matrix Rain Effect */
+    #matrixRain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .portfolio-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 20, 0, 0.95);
+      border: 1px solid #00ff41;
+      border-radius: 15px;
+      padding: 20px;
+      width: 450px;
+      max-width: 90%;
+      z-index: 1000;
+      box-shadow: 0 0 30px rgba(0, 255, 65, 0.5), inset 0 0 20px rgba(0, 255, 65, 0.1);
+      backdrop-filter: blur(10px);
+      font-family: 'Courier New', monospace;
+    }
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .portfolio-close {
+      cursor: pointer;
+      color: #00ff41;
+      font-size: 24px;
+      text-shadow: 0 0 10px #00ff41;
+    }
+    #portfolioForm {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    #coinSelect, #amountInput {
+      flex: 1;
+      padding: 8px;
+      background: rgba(0, 30, 0, 0.8);
+      border: 1px solid #00ff41;
+      color: #00ff41;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+    }
+    .portfolio-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+    .portfolio-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+      background: rgba(0, 30, 0, 0.5);
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+    .portfolio-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .delete-portfolio-item {
+      color: #ff4d4d;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0 5px;
+      text-shadow: 0 0 5px #ff4d4d;
+    }
+    .delete-portfolio-item:hover {
+      color: #ff0000;
+      text-shadow: 0 0 10px #ff0000;
+    }
+    .portfolio-total {
+      text-align: right;
+      font-weight: bold;
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff41;
+      font-family: 'Courier New', monospace;
+    }
+    .portfolio-button {
+      background: linear-gradient(45deg, #00ff41, #00a040);
+      color: #000;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      position: absolute;
+      right: 20px;
+      top: 4px;
+      z-index: 1;
+      box-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #000, #001000, #000);
+      color: #00ff41;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+      margin: 0;
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(0, 255, 65, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 0;
+      width: 100%;
+      height: 100vh;
+    }
+    .table-wrapper {
+      background: rgba(0, 15, 0, 0.9);
+      border-radius: 0;
+      box-shadow: 
+        0 0 40px rgba(0, 255, 65, 0.3),
+        inset 0 0 20px rgba(0, 255, 65, 0.1);
+      width: 100%;
+      overflow-x: auto;
+      border: none;
+      position: relative;
+    }
+    .table-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 255, 65, 0.05) 0%,
+        rgba(0, 255, 65, 0) 20%,
+        rgba(0, 255, 65, 0) 80%,
+        rgba(0, 255, 65, 0.05) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    thead th, tbody td {
+      width: calc(100% / 9);
+    }
+    thead th:nth-child(3), tbody td:nth-child(3) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    thead th {
+      background: linear-gradient(to bottom, #00a040, #00ff41);
+      color: #000;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 10px 5px;
+      border-right: 1px solid rgba(0, 255, 65, 0.5);
+      cursor: pointer;
+      text-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    thead th:first-child { cursor: pointer; }
+    thead th:last-child { border-right: none; }
+    tbody td {
+      padding: 10px 10px;
+      text-align: center;
+      border: 1px solid rgba(0, 255, 65, 0.1);
+      font-size: 13px;
+      transition: all 0.3s ease;
+      background: rgba(0, 20, 0, 0.5);
+    }
+    tbody tr:hover td {
+      background-color: rgba(0, 255, 65, 0.1);
+      box-shadow: inset 0 0 15px rgba(0, 255, 65, 0.2);
+    }
+    td.green { 
+      color: #00ff41; 
+      font-weight: bold; 
+      text-shadow: 0 0 8px rgba(0, 255, 65, 0.7);
+    }
+    td.red   { 
+      color: #ff2a6d; 
+      font-weight: bold; 
+      text-shadow: 0 0 8px rgba(255, 42, 109, 0.7);
+    }
+    td.coin-name {
+      font-weight: bold;
+      text-align: left;
+      padding-left: 10px;
+      color: #00ff41;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+    }
+    td.coin-name a {
+      color: inherit;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    td.coin-name a:hover {
+      text-decoration: none;
+      color: #ffffff;
+      text-shadow: 0 0 10px #ffffff;
+    }
+    .chart-emoji {
+      float: right;
+      margin-left: 5px;
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+    }
+    .chart-emoji:hover {
+      color: #ffffff !important;
+      text-decoration: none !important;
+      text-shadow: 0 0 10px #ffffff;
+      transform: scale(1.2);
+    }
+    .search-input {
+      margin-top: 2px;
+      padding: 5px;
+      font-size: 11px;
+      width: 70px;
+      border: 1px solid #00ff41;
+      border-radius: 3px;
+      background: rgba(0, 30, 0, 0.8);
+      color: #00ff41;
+      font-family: 'Courier New', monospace;
+    }
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00ff41, #00a040, #00ff41);
+      width: 0%;
+      transition: width 0.3s;
+      z-index: 1001;
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+    }
+    
+    @media (max-width: 768px) { table { font-size: 12px; } }
+    
+    /* Matrix code rain effect */
+    .matrix-char {
+      position: absolute;
+      color: #00ff41;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      text-shadow: 0 0 5px #00ff41;
+      opacity: 0.7;
+      z-index: -1;
+    }
+    
+    /* Digital grid background effect */
+    .digital-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: -2;
+      pointer-events: none;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Matrix Rain Effect -->
+<canvas id="matrixRain"></canvas>
+
+<!-- Digital Grid Background -->
+<div class="digital-grid"></div>
+
+<!-- Yükleme Çubuğu -->
+<div class="loading-bar" id="loadingBar"></div>
+
+<!-- Tablo Container -->
+<div class="table-container">
+  <div class="table-wrapper">
+    <table id="coinTable">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">#</th>
+          <th onclick="sortTable(1)">
+            Coin<br>
+            <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
+          </th>
+          <th onclick="sortTable(2)">12 Aylık Dip Fiyatı</th>
+          <th onclick="sortTable(3)">Fiyat</th>
+          <th onclick="sortTable(4)">Dipten Artış</th>
+          <th onclick="sortTable(5)">24s Değişim</th>
+          <th onclick="sortTable(6)">A‑RSI</th>
+          <th onclick="sortTable(7)">H‑RSI</th>
+          <th onclick="sortTable(8)">G‑RSI</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Portföy Modal -->
+<div class="portfolio-modal" id="portfolioModal">
+  <div class="portfolio-header">
+    <h3>Portföy Yönetimi</h3>
+    <span class="portfolio-close" onclick="togglePortfolio()">&times;</span>
+  </div>
+  <form id="portfolioForm" onsubmit="addToPortfolio(event)">
+    <select id="coinSelect" required>
+      <option value="" disabled selected>Coin Seç</option>
+    </select>
+    <input type="number" id="amountInput" step="0.001" placeholder="Miktar" required>
+    <button type="submit">Ekle</button>
+  </form>
+  <div class="portfolio-list" id="portfolioList"></div>
+  <div class="portfolio-total">
+    Toplam Değer: <span id="portfolioTotal">0</span> <span id="portfolioCurrency">USD</span>
+  </div>
+</div>
+
+<script>
+  // Matrix Rain Effect
+  function initMatrixRain() {
+    const canvas = document.getElementById('matrixRain');
+    const ctx = canvas.getContext('2d');
+    
+    // Canvas boyutunu ayarla
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Matrix karakterleri
+    const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charArray = chars.split('');
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    
+    // Her sütun için yağmur damlası
+    const drops = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = 1;
+    }
+    
+    // Matrix yağmuru çiz
+    function draw() {
+      // Yarı saydam siyah arka plan (trail efekti için)
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = '#00ff41';
+      ctx.font = fontSize + 'px monospace';
+      
+      // Her damla için
+      for (let i = 0; i < drops.length; i++) {
+        // Rastgele karakter
+        const text = charArray[Math.floor(Math.random() * charArray.length)];
+        
+        // Karakteri çiz
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        
+        // Damlayı aşağı taşı
+        drops[i]++;
+        
+        // Rastgele sıfırlama
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+      }
+    }
+    
+    // Animasyonu başlat
+    setInterval(draw, 33);
+    
+    // Pencere boyutu değiştiğinde canvas'ı yeniden boyutlandır
+    window.addEventListener('resize', function() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  }
+  
+  // Sayfa yüklendiğinde Matrix yağmurunu başlat
+  window.addEventListener('load', initMatrixRain);
+
+  // Portföy Fonksiyonları
+  let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
+  let currentCurrency = 'USD';
+  
+  function togglePortfolio() {
+    const modal = document.getElementById('portfolioModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if(modal.style.display === 'block') initPortfolioModal();
+  }
+
+  function initPortfolioModal() {
+    const select = document.getElementById('coinSelect');
+    select.innerHTML = '<option value="" disabled selected>Coin Seç</option>';
+    coinList.forEach(coin => {
+      const option = document.createElement('option');
+      option.value = coin;
+      option.textContent = coin;
+      select.appendChild(option);
+    });
+    updatePortfolioDisplay();
+  }
+
+  function addToPortfolio(e) {
+    e.preventDefault();
+    const coin = document.getElementById('coinSelect').value;
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    
+    portfolio[coin] = (portfolio[coin] || 0) + amount;
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+    updatePortfolioDisplay();
+    document.getElementById('amountInput').value = '';
+  }
+
+  function deletePortfolioItem(coin) {
+    delete portfolio[coin];
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+    updatePortfolioDisplay();
+  }
+
+  function updatePortfolioDisplay() {
+    const list = document.getElementById('portfolioList');
+    const totalElement = document.getElementById('portfolioTotal');
+    const currencyElement = document.getElementById('portfolioCurrency');
+    list.innerHTML = '';
+    let total = 0;
+    
+    Object.entries(portfolio).forEach(([coin, amount]) => {
+      const price = parseFloat(
+        [...document.querySelectorAll('.coin-name a')]
+          .find(a => a.textContent === coin)
+          ?.closest('tr')
+          .querySelector('td:nth-child(3)').textContent
+      ) || 0;
+      
+      const item = document.createElement('div');
+      item.className = 'portfolio-item';
+      item.innerHTML = `
+        <span>${coin}</span>
+        <div class="portfolio-item-controls">
+          <span>${amount} x ${price.toFixed(7)} ${currentCurrency} = ${(amount * price).toFixed(2)} ${currentCurrency}</span>
+          <span class="delete-portfolio-item" onclick="deletePortfolioItem('${coin}')">×</span>
+        </div>
+      `;
+      list.appendChild(item);
+      total += amount * price;
+    });
+    
+    totalElement.textContent = total.toFixed(2);
+    currencyElement.textContent = currentCurrency;
+  }
+
+  // Orijinal Scriptler
+  let loadedCoins = 0;
+  let coinList = [];
+
+  function updateProgress() {
+    const totalCoins = coinList.length;
+    const percent = Math.round((loadedCoins / totalCoins) * 100);
+    const loadingBar = document.getElementById('loadingBar');
+    if(loadingBar) {
+      loadingBar.style.width = percent + '%';
+      if(percent >= 100) {
+        setTimeout(() => {
+          loadingBar.style.display = 'none';
+        }, 500);
+      }
+    }
+  }
+
+  function formatNum(val, decimals) {
+    return val.toFixed(decimals).replace(/\.?(0)+$/, '');
+  }
+
+async function loadCoinList() {
+  try {
+    const res = await fetch("https://api.binance.com/api/v3/exchangeInfo");
+    const data = await res.json();
+    
+    // Sadece USDT ile biten semboller
+    coinList = data.symbols
+      .filter(s => s.symbol.endsWith("USDT") && s.status === "TRADING")
+      .map(s => s.baseAsset);
+
+    console.log("Toplam coin:", coinList.length);
+    updateTable(); // tabloyu başlat
+  } catch (e) {
+    console.error("Coin listesi alınamadı:", e);
+  }
+}
+
+loadCoinList();
+
+  const tableBody = document.querySelector('#coinTable tbody');
+  let sortDirection = Array(9).fill(true);
+  const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
+  const rsiHistory = {};
+  const previousPrices = {};
+
+  function computeRSIFromArray(closes) {
+    if (closes.length <= RSI_PERIOD) return NaN;
+    let gain=0, loss=0;
+    for (let i=1;i<=RSI_PERIOD;i++){const d=closes[i]-closes[i-1];gain+=d>0?d:0;loss+=d<0?-d:0;}
+    let avgG=gain/RSI_PERIOD, avgL=loss/RSI_PERIOD;
+    for (let i=RSI_PERIOD+1;i<closes.length;i++){const d=closes[i]-closes[i-1],g=d>0?d:0,l=d<0?-d:0;avgG=(avgG*(RSI_PERIOD-1)+g)/RSI_PERIOD;avgL=(avgL*(RSI_PERIOD-1)+l)/RSI_PERIOD;}
+    if(avgL===0) return 100; const rs=avgG/avgL; return 100-(100/(1+rs));
+  }
+
+  function updateTable() {
+    loadedCoins = 0;
+    const loadingBar = document.getElementById('loadingBar');
+    if(loadingBar) {
+      loadingBar.style.display = 'block';
+      loadingBar.style.width = '0%';
+    }
+
+    const months = 12; // 12 ay sabit olarak ayarlandı
+    fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
+      const map24 = new Map(data.map(d=>[d.symbol,d]));
+      return Promise.all(coinList.map(name=>
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${name}USDT&interval=1M&limit=${months+1}`).then(r=>r.json()).then(klines=>{
+          loadedCoins++;
+          updateProgress();
+          klines.pop(); const dipArr=klines.map(k=>+k[3]); const dip=dipArr.length?Math.min(...dipArr):NaN;
+          const o=map24.get(name+'USDT')||{};
+          return {name,dip,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
+        })
+      ));
+    }).then(list=>{renderTable(list);setupWebSocket();});
+  }
+
+  function renderTable(list) {
+    tableBody.innerHTML='';
+    list.forEach((c,i)=>{
+      const row=document.createElement('tr');
+      row.innerHTML=`
+        <td>${i+1}</td>
+        <td class="coin-name">
+          <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
+          <a href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${c.name}USDT" target="_blank" class="chart-emoji">📈</a>
+        </td>
+        <td>${isNaN(c.dip)?'0':formatNum(c.dip,10)}</td>
+        <td data-original-price="${isNaN(c.currentPrice)?'0':c.currentPrice}">${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice,7)}</td>
+        <td class="${c.dip&&((c.currentPrice-c.dip)/c.dip*100)>0?'green':'red'}">
+          ${!isNaN(c.dip)?formatNum((c.currentPrice-c.dip)/c.dip*100,2)+'%':'0'}
+        </td>
+        <td class="${c.priceChange>0?'green':'red'}">
+          ${isNaN(c.priceChange)?'0':formatNum(c.priceChange,2)+'%'}
+        </td>
+        <td class="a-rsi">…</td>
+        <td class="h-rsi">…</td>
+        <td class="g-rsi">…</td>
+      `;
+      tableBody.appendChild(row);
+      initRSIHistory(c.name,'1M',row.querySelector('.a-rsi'));
+      initRSIHistory(c.name,'1w',row.querySelector('.h-rsi'));
+      initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
+    });
+    applyAllFilters();
+  }
+
+  function initRSIHistory(symbol,interval,cell){
+    const lim=interval==='1d'?RSI_HIST_DAILY:RSI_HIST_OTHER;
+    fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}&limit=${lim}`)
+      .then(r=>r.json()).then(klines=>{
+        if(interval==='1d'){const last=klines.at(-1); if(Date.now()<last[0]+86400000) klines.pop();} else klines.pop();
+        const closes=klines.map(k=>+k[4]);
+        rsiHistory[symbol]=rsiHistory[symbol]||{}; rsiHistory[symbol][interval]=closes;
+        const val=computeRSIFromArray(closes);
+        cell.textContent=isNaN(val)?'0':formatNum(val,2);
+        cell.classList.remove('green','red'); if(val>=70)cell.classList.add('green'); else if(val<=30)cell.classList.add('red');
+      }).catch(_=>cell.textContent='0');
+  }
+
+  function setupWebSocket(){
+    const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${coinList.map(n=>n.toLowerCase()+'usdt@ticker').join('/')}`);
+    const rowMap={}; 
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      const coinName = r.cells[1].querySelector('a').textContent;
+      rowMap[coinName]=r;
+    });
+    
+    ws.onmessage=e=>{
+      const d=JSON.parse(e.data).data; 
+      const nm=d.s.replace('USDT',''); 
+      const row=rowMap[nm]; 
+      if(!row)return;
+      
+      const price=+d.c;
+      const oldPrice = previousPrices[nm] || 0;
+      previousPrices[nm] = price;
+      
+      const priceCell = row.cells[3];
+      priceCell.setAttribute('data-original-price', price);
+      priceCell.textContent = formatNum(price, 7);
+      priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
+      
+      const change=+d.P;
+      row.cells[5].textContent=formatNum(change,2)+'%'; 
+      row.cells[5].className=change>=0?'green':'red';
+      
+      ['1M','1w','1d'].forEach((int,idx)=>{
+        const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
+        if(!hist) return;
+        const arr=hist.slice(); 
+        arr[arr.length-1]=price; 
+        const val=computeRSIFromArray(arr);
+        const cls=idx===0?'.a-rsi':idx===1?'.h-rsi':'.g-rsi'; 
+        const cell=row.querySelector(cls);
+        cell.textContent=isNaN(val)?'0':formatNum(val,2);
+        cell.classList.remove('green','red'); 
+        if(val>=70)cell.classList.add('green'); 
+        else if(val<=30)cell.classList.add('red');
+      });
+    };
+    ws.onclose=()=>setTimeout(setupWebSocket,5000);
+  }
+
+  function searchCoin(){
+    const t=coinSearch.value.toLowerCase(); 
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      const coinName = r.cells[1].querySelector('a').textContent.toLowerCase();
+      r.style.display=coinName.includes(t)?'':'none';
+      if(r.style.display !== 'none') applyOtherFilters(r);
+    });
+  }
+
+  function applyOtherFilters(row) {
+    row.style.display = '';
+  }
+
+  function applyAllFilters() {
+    const searchTerm = document.getElementById('coinSearch').value.toLowerCase();
+    
+    tableBody.querySelectorAll('tr').forEach(row => {
+      const coinName = row.cells[1].querySelector('a').textContent.toLowerCase();
+      const matchesSearch = coinName.includes(searchTerm);
+      
+      if(!matchesSearch) {
+        row.style.display = 'none';
+        return;
+      }
+      
+      row.style.display = '';
+    });
+  }
+
+  function sortTable(colIndex) {
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    const isNumeric = colIndex !== 1; // Coin adı hariç tüm sütunlar sayısal
+    
+    rows.sort((a, b) => {
+      let aVal, bVal;
+      
+      if(colIndex === 1) {
+        // Coin adı sıralaması - metin olarak sırala
+        aVal = a.cells[colIndex].querySelector('a').textContent.toLowerCase();
+        bVal = b.cells[colIndex].querySelector('a').textContent.toLowerCase();
+      } else {
+        // Diğer sütunlar - sayısal sıralama
+        aVal = a.cells[colIndex].textContent.replace(/[^\d.-]/g, '');
+        bVal = b.cells[colIndex].textContent.replace(/[^\d.-]/g, '');
+      }
+      
+      if(isNumeric && colIndex !== 1) {
+        aVal = parseFloat(aVal) || 0;
+        bVal = parseFloat(bVal) || 0;
+      }
+      
+      if(aVal < bVal) return sortDirection[colIndex] ? -1 : 1;
+      if(aVal > bVal) return sortDirection[colIndex] ? 1 : -1;
+      return 0;
+    });
+    
+    sortDirection[colIndex] = !sortDirection[colIndex];
+    tableBody.innerHTML = '';
+    rows.forEach(row => tableBody.appendChild(row));
+  }
+
+  // Sayfa yüklendiğinde yükleme çubuğunu başlat
+  window.addEventListener('load', function() {
+    const loadingBar = document.getElementById('loadingBar');
+    if(loadingBar) {
+      loadingBar.style.width = '0%';
+    }
+  });
+</script>
+</body>
+</html>

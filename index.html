@@ -6,197 +6,188 @@
   <title>Binance Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ====== Genel Reset & Tipografi ====== */
-    * { box-sizing: border-box; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    html,body { height:100%; }
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(28, 95, 212, 0.10), transparent 12%),
-                  radial-gradient(900px 500px at 90% 90%, rgba(102, 126, 234, 0.06), transparent 12%),
-                  linear-gradient(180deg, #0f1724 0%, #081026 100%);
-      color: #e6eef8;
-      min-height: 100vh;
-      -webkit-font-variant-ligatures: none;
+    * { box-sizing: border-box; }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-
-    /* ====== Sahne / Kart ====== */
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #1e3a8a);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color: #e2e8f0;
+      padding: 0;
+      text-align: center;
+      overflow-x: hidden;
+      margin: 0;
+      min-height: 100vh;
+    }
+    
     .table-container {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
+      margin-top: 0;
       width: 100%;
+      height: 100vh;
     }
+    
     .table-wrapper {
-      width: min(1200px, 98%);
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(2,6,23,0.7), inset 0 1px 0 rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.04);
-      overflow: hidden;
-      backdrop-filter: blur(6px) saturate(120%);
-    }
-
-    /* ====== Başlık Çubuğu (Sticky Column Headers) ====== */
-    table {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 0;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       width: 100%;
+      overflow-x: auto;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      position: relative;
+    }
+    
+    table {
       border-collapse: collapse;
+      width: 100%;
       table-layout: fixed;
       font-size: 13px;
-      color: #e6eef8;
     }
-    thead th {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      text-align: center;
-      padding: 12px 10px;
-      font-weight: 700;
-      font-size: 13px;
-      letter-spacing: 0.4px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      color: #dff1ff;
-      text-shadow: 0 1px 0 rgba(0,0,0,0.45);
-      backdrop-filter: blur(3px);
+    
+    thead th, tbody td {
+      width: calc(100% / 9);
     }
-
-    thead th:first-child { border-top-left-radius: 12px; }
-    thead th:last-child  { border-top-right-radius: 12px; }
-
-    /* Daha görsel başlık -- küçük alt çizgi */
-    thead th::after {
-      content: "";
-      display: block;
-      height: 3px;
-      width: 48%;
-      margin: 8px auto 0;
-      border-radius: 3px;
-      background: linear-gradient(90deg, rgba(28,170,255,0.85), rgba(102,126,234,0.85));
-      opacity: 0.25;
-    }
-
-    /* ====== Hücreler ====== */
-    tbody td {
-      padding: 10px;
-      text-align: center;
-      vertical-align: middle;
-      border-bottom: 1px solid rgba(255,255,255,0.02);
-      transition: background 160ms ease, transform 120ms ease;
-      font-variant-numeric: tabular-nums;
-    }
-
-    /* coin-name özel stili */
-    td.coin-name {
-      text-align: left;
-      padding-left: 14px;
-      font-weight: 700;
-      color: #f7fbff;
+    
+    thead th:nth-child(3), tbody td:nth-child(3) {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
-    td.coin-name a { color: inherit; text-decoration: none; display: inline-block; max-width: calc(100% - 36px); }
-    td.coin-name a:hover { text-decoration: underline; opacity: 0.95; }
-
-    /* chart emoji */
-    .chart-emoji {
-      margin-left: auto;
-      font-size: 16px;
+    
+    thead th {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Roboto Mono', monospace;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 10px 5px;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    thead th:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
       transform: translateY(-1px);
-      opacity: 0.95;
-      text-decoration: none !important;
     }
-    .chart-emoji:hover { transform: translateY(-2px) scale(1.05); opacity: 1; }
-
-    /* Alternating rows ve hover efekti */
-    tbody tr:nth-child(odd) td { background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); }
-    tbody tr:nth-child(even) td { background: linear-gradient(90deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005)); }
-    tbody tr:hover td {
-      background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
-    }
-
-    /* Pozitif / negatif renkler - koyu ama canlı */
-    td.green { color: #6ee7b7 !important; font-weight: 700; text-shadow: 0 1px 0 rgba(0,0,0,0.45); }
-    td.red   { color: #ff8b94 !important; font-weight: 700; text-shadow: 0 1px 0 rgba(0,0,0,0.45); }
-
-    /* Sayı hücreleri için küçük paddings */
-    td[data-original-price] { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; }
-
-    /* Arama kutusu */
-    .search-input {
-      margin-top: 6px;
-      padding: 6px 8px;
-      font-size: 12px;
-      width: 92px;
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 8px;
-      background: rgba(255,255,255,0.02);
-      color: #e6eef8;
-      outline: none;
-      transition: box-shadow 120ms ease, transform 120ms ease;
+    
+    thead th:first-child { cursor: pointer; }
+    thead th:last-child { border-right: none; }
+    
+    tbody td {
+      padding: 10px;
       text-align: center;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      font-size: 13px;
+      transition: all 0.3s ease;
+      background-color: rgba(30, 41, 59, 0.6);
+      color: #e2e8f0;
     }
+    
+    tbody tr:hover td {
+      background-color: rgba(51, 65, 85, 0.8);
+      transform: scale(1.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    td.green { 
+      color: #34d399; 
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+    }
+    
+    td.red { 
+      color: #f87171; 
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
+    }
+    
+    td.coin-name {
+      font-weight: bold;
+      text-align: left;
+      padding-left: 10px;
+      color: #f1f5f9;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+    }
+    
+    td.coin-name a {
+      color: #60a5fa;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    td.coin-name a:hover {
+      color: #93c5fd;
+      text-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+    }
+    
+    .chart-emoji {
+      float: right;
+      margin-left: 5px;
+      text-decoration: none !important;
+      filter: grayscale(0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .chart-emoji:hover {
+      filter: grayscale(0) brightness(1.2);
+      transform: scale(1.1);
+    }
+    
+    .search-input {
+      margin-top: 5px;
+      padding: 5px;
+      font-size: 11px;
+      width: 70px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    
     .search-input:focus {
-      box-shadow: 0 6px 20px rgba(28,170,255,0.10);
-      transform: translateY(-1px);
-      border-color: rgba(28,170,255,0.55);
-      background: rgba(255,255,255,0.03);
+      outline: none;
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+      background: rgba(30, 41, 59, 0.95);
     }
-    /* input içindeki placeholder daha soluk */
-    .search-input::placeholder { color: rgba(230,238,248,0.45); }
-
-    /* Yükleme çubuğu (üst) */
+    
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+    
     .loading-bar {
       position: fixed;
-      top: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 6px;
-      border-radius: 6px;
-      background: linear-gradient(90deg, #1dd3a7, #28a7ff, #7b61ff);
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #34d399, #60a5fa, #a78bfa);
       width: 0%;
-      box-shadow: 0 6px 18px rgba(34,42,63,0.6);
-      transition: width 280ms linear, opacity 220ms ease;
+      transition: width 0.3s;
       z-index: 1001;
-      opacity: 0.98;
+      box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
     }
-
-    /* Mobil uyumluluk */
-    @media (max-width: 980px) {
-      body { padding: 12px; }
-      .table-wrapper { padding: 12px; border-radius: 12px; }
-      thead th { font-size: 12px; padding: 10px 6px; }
-      td.coin-name { font-size: 13px; padding-left: 8px; }
-      .search-input { width: 76px; font-size: 11px; }
-    }
-
-    @media (max-width: 620px) {
-      .table-wrapper { width: 100%; padding: 8px; }
-      thead th:nth-child(n+4) { display: none; } /* dar ekranda bazı sütunları gizle (fonksiyon değişmiyor) */
-      tbody td:nth-child(n+4) { display: none; }
-      thead th { font-size: 12px; }
+    
+    @media (max-width: 768px) { 
       table { font-size: 12px; }
+      tbody td { padding: 8px; }
     }
-
-    /* Küçük estetik dokunuşlar */
-    caption {
-      caption-side: top;
-      text-align: left;
-      padding-bottom: 10px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.9);
-    }
-
   </style>
 </head>
 <body>
@@ -219,9 +210,9 @@
           <th onclick="sortTable(3)">Fiyat</th>
           <th onclick="sortTable(4)">Dipten Artış</th>
           <th onclick="sortTable(5)">24s Değişim</th>
-          <th onclick="sortTable(6)">A-RSI</th>
-          <th onclick="sortTable(7)">H-RSI</th>
-          <th onclick="sortTable(8)">G-RSI</th>
+          <th onclick="sortTable(6)">A‑RSI</th>
+          <th onclick="sortTable(7)">H‑RSI</th>
+          <th onclick="sortTable(8)">G‑RSI</th>
         </tr>
       </thead>
       <tbody></tbody>

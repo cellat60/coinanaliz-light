@@ -54,7 +54,7 @@
     }
     
     thead th, tbody td {
-      width: calc(100% / 9);
+      width: calc(100% / 11);
     }
     
     thead th:nth-child(3), tbody td:nth-child(3) {
@@ -213,6 +213,8 @@
           <th onclick="sortTable(6)">A‑RSI</th>
           <th onclick="sortTable(7)">H‑RSI</th>
           <th onclick="sortTable(8)">G‑RSI</th>
+          <th onclick="sortTable(9)">4S‑RSI</th>
+          <th onclick="sortTable(10)">S‑RSI</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -263,7 +265,7 @@ async function loadCoinList() {
 loadCoinList();
 
   const tableBody = document.querySelector('#coinTable tbody');
-  let sortDirection = Array(9).fill(true);
+  let sortDirection = Array(11).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
   const previousPrices = {};
@@ -321,11 +323,15 @@ loadCoinList();
         <td class="a-rsi">…</td>
         <td class="h-rsi">…</td>
         <td class="g-rsi">…</td>
+        <td class="s4-rsi">…</td>
+        <td class="s1-rsi">…</td>
       `;
       tableBody.appendChild(row);
       initRSIHistory(c.name,'1M',row.querySelector('.a-rsi'));
       initRSIHistory(c.name,'1w',row.querySelector('.h-rsi'));
       initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
+      initRSIHistory(c.name,'4h',row.querySelector('.s4-rsi'));
+      initRSIHistory(c.name,'1h',row.querySelector('.s1-rsi'));
     });
     applyAllFilters();
   }
@@ -370,13 +376,13 @@ loadCoinList();
       row.cells[5].textContent=formatNum(change,2)+'%'; 
       row.cells[5].className=change>=0?'green':'red';
       
-      ['1M','1w','1d'].forEach((int,idx)=>{
+      ['1M','1w','1d','4h','1h'].forEach((int,idx)=>{
         const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
         if(!hist) return;
         const arr=hist.slice(); 
         arr[arr.length-1]=price; 
         const val=computeRSIFromArray(arr);
-        const cls=idx===0?'.a-rsi':idx===1?'.h-rsi':'.g-rsi'; 
+        const cls=idx===0?'.a-rsi':idx===1?'.h-rsi':idx===2?'.g-rsi':idx===3?'.s4-rsi':'.s1-rsi'; 
         const cell=row.querySelector(cls);
         cell.textContent=isNaN(val)?'0':formatNum(val,2);
         cell.classList.remove('green','red'); 

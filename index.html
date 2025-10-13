@@ -184,6 +184,12 @@
       box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
     }
     
+    .auto-sort-checkbox {
+      margin-top: 5px;
+      cursor: pointer;
+      accent-color: #60a5fa;
+    }
+    
     @media (max-width: 768px) { 
       table { font-size: 12px; }
       tbody td { padding: 8px; }
@@ -209,10 +215,22 @@
           <th onclick="sortTable(2)">12 Aylık Dip Fiyatı</th>
           <th onclick="sortTable(3)">Fiyat</th>
           <th onclick="sortTable(4)">Dipten Artış</th>
-          <th onclick="sortTable(5)">24s Değişim</th>
-          <th onclick="sortTable(6)">G‑RSI</th>
-          <th onclick="sortTable(7)">4S‑RSI</th>
-          <th onclick="sortTable(8)">S‑RSI</th>
+          <th onclick="sortTable(5)">
+            24s Değişim<br>
+            <input type="checkbox" class="auto-sort-checkbox" id="autoSort24h" onchange="toggleAutoSort(5)">
+          </th>
+          <th onclick="sortTable(6)">
+            G‑RSI<br>
+            <input type="checkbox" class="auto-sort-checkbox" id="autoSortGRSI" onchange="toggleAutoSort(6)">
+          </th>
+          <th onclick="sortTable(7)">
+            4S‑RSI<br>
+            <input type="checkbox" class="auto-sort-checkbox" id="autoSort4SRSI" onchange="toggleAutoSort(7)">
+          </th>
+          <th onclick="sortTable(8)">
+            S‑RSI<br>
+            <input type="checkbox" class="auto-sort-checkbox" id="autoSortSRSI" onchange="toggleAutoSort(8)">
+          </th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -224,6 +242,8 @@
   // Orijinal Scriptler
   let loadedCoins = 0;
   let coinList = [];
+  let autoSortEnabled = Array(9).fill(false);
+  let autoSortInterval = null;
 
   function updateProgress() {
     const totalCoins = coinList.length;
@@ -328,6 +348,7 @@ loadCoinList();
       initRSIHistory(c.name,'1h',row.querySelector('.s1-rsi'));
     });
     applyAllFilters();
+    startAutoSort();
   }
 
   function initRSIHistory(symbol,interval,cell){
@@ -446,6 +467,58 @@ loadCoinList();
     sortDirection[colIndex] = !sortDirection[colIndex];
     tableBody.innerHTML = '';
     rows.forEach(row => tableBody.appendChild(row));
+  }
+
+  function toggleAutoSort(colIndex) {
+    autoSortEnabled[colIndex] = !autoSortEnabled[colIndex];
+    
+    // Diğer sütunlardaki checkbox'ları kapat
+    for(let i = 5; i <= 8; i++) {
+      if(i !== colIndex) {
+        autoSortEnabled[i] = false;
+        document.getElementById(getCheckboxId(i)).checked = false;
+      }
+    }
+    
+    if(autoSortEnabled[colIndex]) {
+      startAutoSort();
+    } else {
+      stopAutoSort();
+    }
+  }
+
+  function getCheckboxId(colIndex) {
+    switch(colIndex) {
+      case 5: return 'autoSort24h';
+      case 6: return 'autoSortGRSI';
+      case 7: return 'autoSort4SRSI';
+      case 8: return 'autoSortSRSI';
+      default: return '';
+    }
+  }
+
+  function startAutoSort() {
+    if(autoSortInterval) {
+      clearInterval(autoSortInterval);
+    }
+    
+    autoSortInterval = setInterval(() => {
+      for(let i = 5; i <= 8; i++) {
+        if(autoSortEnabled[i]) {
+          // Z-A sıralama (büyükten küçüğe)
+          sortDirection[i] = false;
+          sortTable(i);
+          break;
+        }
+      }
+    }, 2000); // 2 saniyede bir güncelle
+  }
+
+  function stopAutoSort() {
+    if(autoSortInterval) {
+      clearInterval(autoSortInterval);
+      autoSortInterval = null;
+    }
   }
 
   // Sayfa yüklendiğinde yükleme çubuğunu başlat

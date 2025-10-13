@@ -3,46 +3,107 @@
 <head>
 <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
   <meta charset="UTF-8">
-  <title>Binance Coin Performans Tablosu</title>
+  <title>Crypto Analiz Merkezi | Binance Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    * { box-sizing: border-box; }
-    
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    /* Ana Renk Değişkenleri - 1.html Tema */
+    :root {
+      --color-dark: #121212;        /* Derin Siyah - Ana Arka Plan */
+      --color-mid-dark: #202020;    /* Orta Siyah - Kartlar, Portföy Kutuları */
+      --color-gold: #FFC300;        /* Parlak Sarı/Altın - Ana Vurgu, Artışlar */
+      --color-red: #FF4500;         /* Parlak Kırmızı - Düşüşler */
+      --color-light: #F0F0F0;       /* Açık Gri - Temel Metin */
+      --color-border: #333333;      /* Sınır Çizgileri */
     }
+
+    * { box-sizing: border-box; }
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #1e3a8a);
-      background-size: 400% 400%;
-      animation: gradientShift 15s ease infinite;
-      color: #e2e8f0;
+      background-color: var(--color-dark);
+      color: var(--color-light);
       padding: 0;
-      text-align: center;
-      overflow-x: hidden;
       margin: 0;
       min-height: 100vh;
     }
     
+    /* BAŞLIK (HEADER) - 1.html'den */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--color-mid-dark);
+      padding: 15px 30px;
+      border-bottom: 3px solid var(--color-gold);
+    }
+
+    .logo {
+      color: var(--color-gold);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    /* NAVİGASYON - 1.html'den */
+    .nav a {
+      color: var(--color-light);
+      text-decoration: none;
+      margin-left: 25px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav a:hover {
+      color: var(--color-gold);
+    }
+    
+    /* KONTEYNER - 1.html'den */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* BUTONLAR VE FİLTRELER - 1.html'den */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      background-color: var(--color-mid-dark);
+      color: var(--color-light);
+      border: 1px solid var(--color-border);
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn:hover, .btn.active {
+      background-color: var(--color-gold);
+      color: var(--color-dark);
+      border-color: var(--color-gold);
+    }
+    
+    /* TABLO KONTEYNER - 2.html'den uyarlanmış */
     .table-container {
       display: flex;
       justify-content: center;
       margin-top: 0;
       width: 100%;
-      height: 100vh;
     }
     
     .table-wrapper {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(12px);
-      border-radius: 0;
+      background: var(--color-mid-dark);
+      border-radius: 6px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
       width: 100%;
       overflow-x: auto;
-      border: 1px solid rgba(148, 163, 184, 0.1);
+      border: 1px solid var(--color-border);
       position: relative;
     }
     
@@ -63,89 +124,83 @@
       text-overflow: ellipsis;
     }
     
+    /* TABLO BAŞLIKLARI - 1.html'den uyarlanmış */
     thead th {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: #ffffff;
+      background-color: var(--color-mid-dark);
+      color: var(--color-gold);
       font-size: 14px;
-      font-weight: bold;
-      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       position: sticky;
       top: 0;
       z-index: 2;
       padding: 10px 5px;
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 2px solid var(--color-border);
       cursor: pointer;
       transition: all 0.3s ease;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
     
     thead th:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
-      transform: translateY(-1px);
+      background-color: #2a2a2a;
     }
     
     thead th:first-child { cursor: pointer; }
     thead th:last-child { border-right: none; }
     
+    /* TABLO HÜCRELERİ - 1.html'den uyarlanmış */
     tbody td {
       padding: 10px;
       text-align: center;
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-bottom: 1px solid var(--color-border);
       font-size: 13px;
       transition: all 0.3s ease;
-      background-color: rgba(30, 41, 59, 0.6);
-      color: #e2e8f0;
+      background-color: var(--color-mid-dark);
+      color: var(--color-light);
     }
     
     tbody tr:hover td {
-      background-color: rgba(51, 65, 85, 0.8);
-      transform: scale(1.01);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      background-color: #2a2a2a;
     }
     
-    td.green { 
-      color: #34d399; 
+    /* Değişim Vurguları - 1.html'den */
+    .green, .change-up { 
+      color: var(--color-gold); 
       font-weight: bold;
-      text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
     }
     
-    td.red { 
-      color: #f87171; 
+    .red, .change-down { 
+      color: var(--color-red); 
       font-weight: bold;
-      text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
     }
     
     td.coin-name {
       font-weight: bold;
       text-align: left;
       padding-left: 10px;
-      color: #f1f5f9;
+      color: var(--color-light);
       overflow: hidden;
       text-overflow: ellipsis;
       position: relative;
     }
     
     td.coin-name a {
-      color: #60a5fa;
+      color: var(--color-gold);
       text-decoration: none;
       transition: all 0.3s ease;
     }
     
     td.coin-name a:hover {
-      color: #93c5fd;
-      text-shadow: 0 0 8px rgba(96, 165, 250, 0.6);
+      color: #e6b300;
     }
     
     .chart-emoji {
       float: right;
       margin-left: 5px;
       text-decoration: none !important;
-      filter: grayscale(0.3);
       transition: all 0.3s ease;
     }
     
     .chart-emoji:hover {
-      filter: grayscale(0) brightness(1.2);
       transform: scale(1.1);
     }
     
@@ -154,18 +209,18 @@
       padding: 5px;
       font-size: 11px;
       width: 70px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
+      border: 1px solid var(--color-border);
       border-radius: 6px;
-      background: rgba(30, 41, 59, 0.8);
-      color: #e2e8f0;
+      background: var(--color-dark);
+      color: var(--color-light);
       transition: all 0.3s ease;
     }
     
     .search-input:focus {
       outline: none;
-      border-color: #60a5fa;
-      box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
-      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--color-gold);
+      box-shadow: 0 0 0 2px rgba(255, 195, 0, 0.2);
+      background: var(--color-mid-dark);
     }
     
     .search-input::placeholder {
@@ -177,22 +232,34 @@
       top: 0;
       left: 0;
       height: 3px;
-      background: linear-gradient(90deg, #34d399, #60a5fa, #a78bfa);
+      background: linear-gradient(90deg, var(--color-gold), #e6b300, #ffdd00);
       width: 0%;
       transition: width 0.3s;
       z-index: 1001;
-      box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
     }
     
     .auto-sort-checkbox {
       margin-top: 5px;
       cursor: pointer;
-      accent-color: #60a5fa;
+      accent-color: var(--color-gold);
     }
     
     @media (max-width: 768px) { 
       table { font-size: 12px; }
       tbody td { padding: 8px; }
+      
+      .header {
+        flex-direction: column;
+        padding: 10px;
+      }
+      
+      .nav {
+        margin-top: 10px;
+      }
+      
+      .nav a {
+        margin: 0 10px;
+      }
     }
   </style>
 </head>
@@ -201,40 +268,57 @@
 <!-- Yükleme Çubuğu -->
 <div class="loading-bar" id="loadingBar"></div>
 
-<!-- Tablo Container -->
-<div class="table-container">
-  <div class="table-wrapper">
-    <table id="coinTable">
-      <thead>
-        <tr>
-          <th onclick="sortTable(0)">#</th>
-          <th onclick="sortTable(1)">
-            Coin<br>
-            <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
-          </th>
-          <th onclick="sortTable(2)">12 Aylık Dip Fiyatı</th>
-          <th onclick="sortTable(3)">Fiyat</th>
-          <th onclick="sortTable(4)">Dipten Artış</th>
-          <th onclick="sortTable(5)">
-            24s Değişim<br>
-            <input type="checkbox" class="auto-sort-checkbox" id="autoSort24h" onchange="toggleAutoSort(5)">
-          </th>
-          <th onclick="sortTable(6)">
-            G‑RSI<br>
-            <input type="checkbox" class="auto-sort-checkbox" id="autoSortGRSI" onchange="toggleAutoSort(6)">
-          </th>
-          <th onclick="sortTable(7)">
-            4S‑RSI<br>
-            <input type="checkbox" class="auto-sort-checkbox" id="autoSort4SRSI" onchange="toggleAutoSort(7)">
-          </th>
-          <th onclick="sortTable(8)">
-            S‑RSI<br>
-            <input type="checkbox" class="auto-sort-checkbox" id="autoSortSRSI" onchange="toggleAutoSort(8)">
-          </th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<!-- BAŞLIK - 1.html'den -->
+<header class="header">
+  <div class="logo">COIN ANALİZ MERKEZİ</div>
+  <nav class="nav">
+    <button class="btn"><i class="fas fa-download"></i> Favorileri İndir</button>
+    <button class="btn"><i class="fas fa-upload"></i> Favorileri Yükle</button>
+    <a href="#">Piyasalar</a>
+    <a href="#">Analiz</a>
+    <a href="#">Portföyüm</a>
+    <a href="#">Ayarlar</a>
+  </nav>
+</header>
+
+<!-- KONTEYNER - 1.html'den -->
+<div class="container">
+  
+  <!-- Tablo Container -->
+  <div class="table-container">
+    <div class="table-wrapper">
+      <table id="coinTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)">#</th>
+            <th onclick="sortTable(1)">
+              Coin<br>
+              <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
+            </th>
+            <th onclick="sortTable(2)">12 Aylık Dip Fiyatı</th>
+            <th onclick="sortTable(3)">Fiyat</th>
+            <th onclick="sortTable(4)">Dipten Artış</th>
+            <th onclick="sortTable(5)">
+              24s Değişim<br>
+              <input type="checkbox" class="auto-sort-checkbox" id="autoSort24h" onchange="toggleAutoSort(5)">
+            </th>
+            <th onclick="sortTable(6)">
+              G‑RSI<br>
+              <input type="checkbox" class="auto-sort-checkbox" id="autoSortGRSI" onchange="toggleAutoSort(6)">
+            </th>
+            <th onclick="sortTable(7)">
+              4S‑RSI<br>
+              <input type="checkbox" class="auto-sort-checkbox" id="autoSort4SRSI" onchange="toggleAutoSort(7)">
+            </th>
+            <th onclick="sortTable(8)">
+              S‑RSI<br>
+              <input type="checkbox" class="auto-sort-checkbox" id="autoSortSRSI" onchange="toggleAutoSort(8)">
+            </th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 </div>
 

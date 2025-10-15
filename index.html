@@ -272,12 +272,7 @@
 <header class="header">
   <div class="logo">COIN ANALİZ MERKEZİ</div>
   <nav class="nav">
-    <button class="btn"><i class="fas fa-download"></i> Favorileri İndir</button>
-    <button class="btn"><i class="fas fa-upload"></i> Favorileri Yükle</button>
-    <a href="#">Piyasalar</a>
-    <a href="#">Analiz</a>
-    <a href="#">Portföyüm</a>
-    <a href="#">Ayarlar</a>
+    <!-- Butonlar kaldırıldı -->
   </nav>
 </header>
 
@@ -344,6 +339,7 @@
   }
 
   function formatNum(val, decimals) {
+    if (isNaN(val) || val === 0) return '0';
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
 
@@ -439,13 +435,35 @@ loadCoinList();
     const lim=interval==='1d'?RSI_HIST_DAILY:RSI_HIST_OTHER;
     fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}&limit=${lim}`)
       .then(r=>r.json()).then(klines=>{
-        if(interval==='1d'){const last=klines.at(-1); if(Date.now()<last[0]+86400000) klines.pop();} else klines.pop();
+        if(!klines || klines.length === 0) {
+          cell.textContent = '0';
+          return;
+        }
+        
+        if(interval==='1d'){
+          const last=klines.at(-1); 
+          if(Date.now()<last[0]+86400000) klines.pop();
+        } else {
+          klines.pop();
+        }
+        
         const closes=klines.map(k=>+k[4]);
-        rsiHistory[symbol]=rsiHistory[symbol]||{}; rsiHistory[symbol][interval]=closes;
+        if (closes.length <= RSI_PERIOD) {
+          cell.textContent = '0';
+          return;
+        }
+        
+        rsiHistory[symbol]=rsiHistory[symbol]||{}; 
+        rsiHistory[symbol][interval]=closes;
         const val=computeRSIFromArray(closes);
         cell.textContent=isNaN(val)?'0':formatNum(val,2);
-        cell.classList.remove('green','red'); if(val>=70)cell.classList.add('green'); else if(val<=30)cell.classList.add('red');
-      }).catch(_=>cell.textContent='0');
+        cell.classList.remove('green','red'); 
+        if(val>=70)cell.classList.add('green'); 
+        else if(val<=30)cell.classList.add('red');
+      }).catch(_=>{
+        console.error(`RSI verisi alınamadı: ${symbol} ${interval}`);
+        cell.textContent='0';
+      });
   }
 
   function setupWebSocket(){
